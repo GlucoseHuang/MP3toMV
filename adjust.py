@@ -1,10 +1,10 @@
-def Adjust(a1, a2, a3):
-    from pydub import AudioSegment
-    from pydub.playback import play
-    import tkinter
-    from tkinter import ttk
-    from sys import exit
+from pydub import AudioSegment
+from pydub.playback import play
+from tkinter import ttk
+import tkinter
 
+
+def Adjust(a1, a2, a3):
     def Start(a1, a2):
         s = eval(StartPoint.get())
         d = eval(Duration.get())
@@ -57,7 +57,7 @@ def Adjust(a1, a2, a3):
     Duration.insert(0, "3000")
     Duration.grid(column=5, row=0, sticky='W')
 
-    tkinter.Button(frame, text='完成', width=6, height=1, command=lambda: Finish(a2, a3)). \
-        grid(column=6, row=0, sticky='W')
+    tkinter.Button(frame, text='完成', width=6, height=1, command=lambda: Finish(a2, a3)).grid(column=6, row=0,
+                                                                                             sticky='W')
 
     tkinter.mainloop()

@@ -11,6 +11,7 @@ DateString = now_date.strftime("%Y-%m-%d %I.%M.%S")
 SourceMp3Name = input("输入mp3全名:")
 KeyWord = ".".join(SourceMp3Name.split(".")[:-1])
 
+
 def DownloadMV(MVID, filename):
     MVAPI = f"https://api.imjad.cn/cloudmusic/?type=mv&id={MVID}"
 

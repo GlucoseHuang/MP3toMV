@@ -1,11 +1,12 @@
-MyHeader = {
+import json
+import re
+import requests
+
+headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36 Edg/81.0.416.72"}
 
 
 def Search(word, Type, limit=5):
-    import requests
-    import json
-
     # 设置搜索类型
     Type = Type.lower()
     TypeDict = {"playlists": 1000, "artists": 100, "mvs": 1004}
@@ -13,7 +14,7 @@ def Search(word, Type, limit=5):
     # 设置参数，对API发送请求
     url = "http://music.163.com/api/search/pc"
     dt = {"s": word, "offset": "0", "limit": limit, "type": TypeDict[Type]}
-    response = requests.post(url, data=dt, headers=MyHeader)
+    response = requests.post(url, data=dt, headers=headers)
 
     # 对结果进行解析，返回所有搜索到的歌单(歌手)的id和名称
     try:
@@ -25,14 +26,11 @@ def Search(word, Type, limit=5):
 
 
 def GetSongID(ID, Type):
-    import requests
-    import re
-
     # Type为playlist或artist
     url = f"https://music.163.com/{Type.lower()}?id={ID}"
 
     # 设置请求头，查看url源代码
-    doc = requests.get(url, headers=MyHeader).text
+    doc = requests.get(url, headers=headers).text
 
     # 正则表达式匹配每个SongId
     SongIdPattern = re.compile(r'<a href="/song\?id=(\d{1,20})">')
@@ -42,12 +40,8 @@ def GetSongID(ID, Type):
 
 
 def GetArtistInfo(ArtistID):
-    import json
-    import requests
-    import re
-
     url = f"http://music.163.com/api/artist/albums/{ArtistID}?id={ArtistID}&offset=0&total=true&limit=1"
-    doc = requests.get(url, headers=MyHeader).text
+    doc = requests.get(url, headers=headers).text
 
     data = json.loads(doc)
     try:
@@ -58,7 +52,7 @@ def GetArtistInfo(ArtistID):
         return [0, '', 0, 0, 0]
 
     url = f"https://music.163.com/artist?id={ArtistID}"
-    doc = requests.get(url, headers=MyHeader).text
+    doc = requests.get(url, headers=headers).text
     UserIDPtn = re.compile(r'<a id="artist-home" href="/user/home\?id=(\d+?)" class="btn-rz f-tid">Ta的个人主页</a>')
     try:
         UserID = int(re.findall(UserIDPtn, doc)[0])
@@ -69,11 +63,8 @@ def GetArtistInfo(ArtistID):
 
 
 def GetSongInfo(SongID):
-    import json
-    import requests
-
     url = f"http://music.163.com/api/song/detail/?id={SongID}&ids=[{SongID}]"
-    doc = requests.get(url, headers=MyHeader).text
+    doc = requests.get(url, headers=headers).text
     data = json.loads(doc)
 
     try:
@@ -88,11 +79,8 @@ def GetSongInfo(SongID):
 
 
 def GetAlbumInfo(AlbumID):
-    import requests
-    import re
-
     url = f"https://music.163.com/album?id={AlbumID}"
-    doc = requests.get(url, headers=MyHeader).text
+    doc = requests.get(url, headers=headers).text
 
     AlbumNamePtn = re.compile(r'<meta property="og:title" content="(.*?)" />')
     AlbumSizePtn = re.compile(r'<h3><span class="f-ff2">包含歌曲列表</span></h3><span class="sub s-fc3">(\d+?)首歌</span>')
@@ -105,7 +93,7 @@ def GetAlbumInfo(AlbumID):
         AlbumSize = int(re.findall(AlbumSizePtn, doc)[0])
         ArtistID = int(re.findall(ArtistIDPtn, doc)[0])
         AlbumPublishDate = re.findall(AlbumPublishDatePtn, doc)[0]
-        SongIDs = list(map(int,  re.findall(SongIDPtn, doc)))
+        SongIDs = list(map(int, re.findall(SongIDPtn, doc)))
     except IndexError:
         return [0, '', 0, '', 0, 0]
 
@@ -113,11 +101,8 @@ def GetAlbumInfo(AlbumID):
 
 
 def GetPlaylistInfo(PlaylistID):
-    import re
-    import requests
-
     url = f"https://music.163.com/playlist?id={PlaylistID}"
-    doc = requests.get(url, headers=MyHeader).text
+    doc = requests.get(url, headers=headers).text
 
     PlaylistNamePtn = re.compile(r'"title": "(.*?)",')
     PlaylistLikesPtn = re.compile(r'data-count="(\d+?)"\ndata-res-action="fav"')
@@ -146,11 +131,8 @@ def GetPlaylistInfo(PlaylistID):
 
 
 def GetUserInfo(UserID):
-    import re
-    import requests
-
     url = f"https://music.163.com/user/home?id={UserID}"
-    doc = requests.get(url, headers=MyHeader).text
+    doc = requests.get(url, headers=headers).text
 
     UserNamePtn = re.compile(r'"title": "(.*?)",')
     LocationPtn = re.compile(r'<span>所在地区：(.*) </span>')
@@ -158,7 +140,7 @@ def GetUserInfo(UserID):
     FollowsPtn = re.compile(r'<strong id="follow_count">(\d+?)</strong>')
     ArtistIDPtn = re.compile(
         r'<div class="edit"><a href="/artist\?id=(\d+?)" hidefocus="true" class="u-btn2 u-btn2-1">')
-    
+
     try:
         UserName = re.findall(UserNamePtn, doc)[0]
     except IndexError:
@@ -178,11 +160,8 @@ def GetUserInfo(UserID):
 
 
 def GetMVInfo(MVID):
-    import json
-    import requests
-
     url = f"http://music.163.com/api/mv/detail?id={MVID}&type=mp4"
-    doc = requests.get(url, headers=MyHeader).text
+    doc = requests.get(url, headers=headers).text
     data = json.loads(doc)
     try:
         MVName = data["data"]["name"]
